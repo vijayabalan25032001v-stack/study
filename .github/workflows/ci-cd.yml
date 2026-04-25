@@ -1,0 +1,51 @@
+name: Beginner CI/CD
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Continuous Integration (CI)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Basic quality check
+        run: |
+          echo "CI is running."
+          echo "This is where tests and lint checks go."
+          echo "Pipeline started at: $(date -u)"
+
+  cd:
+    name: Continuous Delivery (CD)
+    needs: ci
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build step (example)
+        run: |
+          mkdir -p output
+          echo "Hello from your first CI/CD pipeline!" > output/release.txt
+          echo "Built at: $(date -u)" >> output/release.txt
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: beginner-release
+          path: output/release.txt
+
+      - name: Deploy step placeholder
+        run: |
+          echo "CD step reached."
+          echo "Replace this with deploy commands for your app."
