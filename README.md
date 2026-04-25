@@ -1,46 +1,83 @@
-# Beginner CI/CD Starter
+# Fullstack CI/CD Beginner Project
 
-This repository contains a **very simple CI/CD pipeline** using **GitHub Actions**.
+This repo now has a complete small app:
 
-## What CI/CD means
+- `api`: Node.js + Express API
+- `frontend`: Vite frontend (HTML/CSS/JS)
+- `.github/workflows/ci-cd.yml`: CI/CD pipeline for both
 
-- CI (Continuous Integration): automatically checks your code when you push changes.
-- CD (Continuous Delivery): automatically prepares/deploys your app after CI passes.
+## Project structure
 
-## What this starter pipeline does
+```text
+.
+├─ api
+│  ├─ src
+│  │  ├─ app.js
+│  │  └─ server.js
+│  └─ test
+│     └─ app.test.js
+├─ frontend
+│  ├─ src
+│  │  ├─ main.js
+│  │  └─ style.css
+│  └─ index.html
+└─ .github/workflows/ci-cd.yml
+```
 
-File: `.github/workflows/ci-cd.yml`
+## API endpoints
 
-- Runs on:
-  - push to `main`
-  - pull request to `main`
-  - manual trigger (`workflow_dispatch`)
+- `GET /api/health`
+- `GET /api/tasks`
+- `POST /api/tasks` with JSON body: `{ "title": "New task" }`
+
+## Run locally
+
+Open two terminals in this repo:
+
+1. Start API:
+
+```powershell
+cd api
+npm ci
+npm run dev
+```
+
+2. Start frontend:
+
+```powershell
+cd frontend
+npm ci
+npm run dev
+```
+
+Frontend usually opens at `http://localhost:5173` and API runs at `http://localhost:4000`.
+
+## CI/CD pipeline
+
+Workflow: `.github/workflows/ci-cd.yml`
+
 - CI job:
-  - checks out your code
-  - runs a basic quality step
-- CD job:
-  - runs only after CI passes
-  - creates a sample build file (`output/release.txt`)
-  - uploads it as an artifact
-  - includes a deploy placeholder
+  - installs API dependencies
+  - runs API tests
+  - installs frontend dependencies
+  - builds frontend
+- CD job (only on push to `main`):
+  - rebuilds frontend
+  - uploads `frontend/dist` as artifact
+  - includes deploy placeholder commands
 
-## How to use it
+## Push and trigger workflow
 
-1. Create a GitHub repository and push this folder.
-2. Ensure your default branch is named `main`.
-3. Open GitHub -> **Actions** tab.
-4. You should see **Beginner CI/CD** workflow run after push.
-5. Click the run and open logs for each step.
+```powershell
+git add .
+git commit -m "Add fullstack app with CI/CD"
+git push
+```
 
-## Next beginner improvements
+Then open GitHub -> **Actions** -> **Fullstack CI/CD (Beginner)**.
 
-When you add a real app:
+## Next upgrade ideas
 
-- Node.js app:
-  - add `npm ci`
-  - add `npm test`
-- Python app:
-  - add `pip install -r requirements.txt`
-  - add `pytest`
-
-Then replace the **Deploy step placeholder** with real deploy commands (for example to Render, Railway, Vercel, AWS, etc.).
+1. Add database (SQLite or PostgreSQL) for tasks.
+2. Add frontend tests (Vitest + Testing Library).
+3. Replace CD placeholder with real deployment target.

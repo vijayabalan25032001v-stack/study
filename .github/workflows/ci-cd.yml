@@ -1,4 +1,4 @@
-name: Beginner CI/CD
+name: Fullstack CI/CD (Beginner)
 
 on:
   push:
@@ -18,34 +18,57 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Basic quality check
-        run: |
-          echo "CI is running."
-          echo "This is where tests and lint checks go."
-          echo "Pipeline started at: $(date -u)"
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: API - Install dependencies
+        working-directory: api
+        run: npm ci
+
+      - name: API - Run tests
+        working-directory: api
+        run: npm test
+
+      - name: Frontend - Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Frontend - Build
+        working-directory: frontend
+        run: npm run build
 
   cd:
     name: Continuous Delivery (CD)
     needs: ci
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build step (example)
-        run: |
-          mkdir -p output
-          echo "Hello from your first CI/CD pipeline!" > output/release.txt
-          echo "Built at: $(date -u)" >> output/release.txt
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      - name: Upload build artifact
+      - name: Frontend - Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Frontend - Build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
         with:
-          name: beginner-release
-          path: output/release.txt
+          name: frontend-dist
+          path: frontend/dist
 
       - name: Deploy step placeholder
         run: |
           echo "CD step reached."
-          echo "Replace this with deploy commands for your app."
+          echo "Replace this with real deploy commands."
+          echo "Example targets: Render, Railway, Vercel, AWS, Azure."
